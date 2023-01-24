@@ -1,14 +1,25 @@
 <template>
     <v-card class="cardLogin">
-        <v-card-title>Login</v-card-title>
+        <v-card-title class="title">Me parecio ver un lindo gatito </v-card-title>
         <v-card-text>
-            <v-form v-model="formularioValido">
-                <v-text-field label="Correo Electrónico" placeholder="Correo electronico" v-model="correoElectronico"/>
+            <v-row justify="center" align="center">
+                <v-col cols="4" align-self="center">
+                    <img src="../../assets/img/piolin.jpg" alt="" class="imgLogin">
+                </v-col>
+                <v-col cols="8" align-self="center">
+            
+            <v-form ref="formlogin">
+                <v-text-field label="Correo Electrónico" placeholder="Correo electronico" v-model="correoElectronico" :rules="validarCorreo"/>
+                <v-text-field label="Password" placeholder="Password" v-model="password" :rules="validarPassword"/>
             </v-form>
+                 </v-col>
+            </v-row>
         </v-card-text>
         
         <v-card-actions>
-            Boton para iniciar sesion
+            <v-btn class="btnLogin" rounded block @click='loginBackend'>
+                Login
+            </v-btn>
         </v-card-actions>
     </v-card>
 </template>
@@ -17,8 +28,27 @@
     export default{
         data(){
             return{
-                formularioValido: false,
-                correoElectronico: ''
+                correoElectronico: '',
+                validarCorreo:[
+                    v => !v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+                ],
+                password: '',
+                validarPassword:[
+                    value => value.length >= 6 || 'Minimo 6 caracteres'
+                    ]
+                }
+                
+        },
+
+        methods:{
+            loginBackend (){
+                const valid = this.$refs.formlogin.validate()
+                if(valid){
+                    alert('Presionaste el boton')
+                }else{
+                    alert('No cumpliste las reglas, come plomo lindo gatito')
+                }
+                
             }
         }
     }
@@ -30,5 +60,24 @@
         border-radius: 10px;
         width: 500px;
         height: 300px;
+    }
+
+    .imgLogin{
+        width: 100%;
+        border-radius: 10px;
+
+    }
+
+    .btnLogin{
+        background-color: rgb(104, 211, 104) !important;
+        color: black;
+        
+    }
+
+    .title{
+        font-size: 30px;
+        justify-content: center;
+        color: maroon;
+        font-weight: 700;
     }
 </style>
