@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { async } from 'q'
+
     export default{
         data(){
             return{
@@ -41,10 +43,23 @@
         },
 
         methods:{
-            loginBackend (){
+            async loginBackend (){
                 const valid = this.$refs.formlogin.validate()
                 if(valid){
-                    alert('Presionaste el boton')
+                    const sendData = {
+                        email: this.correoElectronico,
+                        password: this.password
+                    }
+                    await this.$auth.loginWith('local',{
+                        data: sendData
+                    }).then(async (res) =>{
+                        console.log('Respuesta del back:', res)
+                        if(res.data.error == null){
+                            this.$router.push('/dashboard')
+                        }
+                    }).catch((error) =>{
+                        console.log('error: ', error)
+                    })
                 }else{
                     alert('No cumpliste las reglas, come plomo lindo gatito')
                 }

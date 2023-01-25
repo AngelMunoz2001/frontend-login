@@ -49,37 +49,20 @@ export default {
     '@nuxtjs/auth'
   ],
 
-  auth: {
-    redirect: {
-      login: '/',
-      logout: '/',
-      home: '/',
-      callback: '/',
-    },
-    localStorage: false,
-    resetOnError: true,
-    strategies: {
-      local: {
-        cookies: false,
-        user: {
-          property: user
-        },
-        token: {
-          property: 'token',
-          require: true
-        },
-        endpoints: {
-          login: {
-            url: '/user/login',
-            method: 'post'
-          },
-          user: false
-        },
-        rewriteRedirects: true,
-        fullPathRedirects: true
-      }
-    }
-  },
+  auth: {    
+    redirect: {      
+      login: '/',      
+      logout: '/',      
+      home: '/',      
+      callback: '/'    },    
+      localStorage: false,    
+      resetOnError: true,    
+      strategies: {      local: {        
+        cookie: false,        
+        user: {          
+        property: 
+          'user'        },        
+          token: {          property: 'token',          required: true        },        endpoints: {          login: {            url: '/user/login',            method: 'post'          },          user: false        },        rewriteRedirects: true,        fullPathRedirect: true      }    }  },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
