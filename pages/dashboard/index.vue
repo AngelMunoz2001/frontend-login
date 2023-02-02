@@ -1,18 +1,11 @@
- <template>
-    <div class="tabla">
+<template>
+    <div style="padding: 20px;">
         <principal />
     </div>
-</template>
-
-<style>
-    .tabla{
-        padding: 300px;
-        
-    }
-</style>
+ </template>
 
  <script>
-    import principal from '~/components/dashboard/principal.vue';
+import principal from '~/components/dashboard/principal.vue';
 
     export default{
         auth: true,
