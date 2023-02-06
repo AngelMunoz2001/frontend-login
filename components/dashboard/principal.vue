@@ -11,12 +11,12 @@
           <template #[`item.actions`]=" { item }">
             <v-row class="renglon">
               <v-col cols="6" >
-                <v-btn icon color="orange">
+                <v-btn icon color="orange" @click="dialogA(item)">
                   <v-icon>mdi-human-edit</v-icon>
                 </v-btn>
               </v-col>
               <v-col cols="6">
-                <v-btn icon color="red" @click="eraseUser(item)">
+                <v-btn icon color="red" @click="dialogUser(item)">
                   <v-icon>mdi-eraser</v-icon>
                 </v-btn>
               </v-col>
@@ -29,15 +29,15 @@
           <v-btn block color="blue" @click="open">
                     Nuevo Usuario
           </v-btn>
-            
         </v-row>
+
+        <!--Formulario para registrar-->
         <v-dialog v-model="openDialog" width="800" height="500" persistent>
             <v-card>
                 <v-card-title>
                     Datos del usuario
                 </v-card-title>
                 <v-card-text>
-                    <!--Formulario para registrar-->
                     <v-form ref="formRegistro">
                         <v-text-field v-model="name" type="text" placeholder="Name:" label="Name"></v-text-field>
                         <v-text-field v-model="lastname" type="text" placeholder="Lastname:" label="Lastname"></v-text-field>
@@ -61,6 +61,50 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <!--Formulario para actualizar-->
+        <v-dialog v-model="openDialogActualizar" width="800" height="500" persistent>
+            <v-card>
+                <v-card-title>Actualizar Usuario</v-card-title>
+                <v-card-text>
+                    <v-form ref="formActualizar">
+                        <v-text-field v-model="name" type="text" placeholder="Name:" label="Name"></v-text-field>
+                        <v-text-field v-model="lastname" type="text" placeholder="Lastname:" label="Lastname"></v-text-field>
+                        <v-text-field v-model="email" type="email" placeholder="Email:" label="Email"></v-text-field>
+                        <v-text-field v-model="password" type="password" placeholder="Password:" label="Password"></v-text-field>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions style="width: 100%; display: flex; flex-direction: column;">
+                    <v-row style="width: 100%; margin-top:5px;margin-bottom: 10px;">
+                        <v-btn block color="green" @click="actualizarUsuario">
+                            Actualizar
+                        </v-btn>
+                    </v-row>
+                    <v-row style="width: 100%; margin-top:5px;margin-bottom: 10px;">
+                        <v-btn block color="red" @click="openDialogActualizar= false">
+                            Cancelar
+                        </v-btn>
+                    </v-row>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!--Ventana para eliminar-->
+        <v-dialog v-model="openDialogErase" width="500" height="500" persistent>
+            <v-card>
+                <v-card-title>Borrar Usuario</v-card-title>
+                <v-card-text>Seguro que lo quieres borrar?</v-card-text>
+                <v-card-actions>
+                    <v-btn color="red" @click="openDialogErase= false">Cancelar</v-btn>
+                    <v-btn color="green" @click="eraseUser">Borrar</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        
+        
+
+        
     </v-col>
 </template>
 
@@ -101,10 +145,15 @@
                     }
                 ],
                 openDialog: false,
+                openDialogActualizar: false,
+                idUpdateUser: '',
                 name:'',
                 lastname: '',
                 email: '',
-                password: ''
+                password: '',
+                idEraseUser: '',
+                openDialogErase: false,
+                admin: 'adminangel'
 
             }
         },
@@ -119,7 +168,7 @@
                         'Access-Control-Allow-Origin': '*'
                     }
                 }
-                await this.$axios.get('/getallusers', config)
+                await this.$axios.get('/user/getallusers', config)
                     .then((res) => {
                         console.log('res',res)
                         if(res.data.message === 'Usuarios'){
@@ -133,6 +182,7 @@
             open (){
                 this.openDialog = true
             },
+
             async registraUsuario(){
                 const config = {
                     headers: {
@@ -146,7 +196,7 @@
                     email: this.email,
                     password: this.password
                 }
-                await this.$axios.post('/register', usuarioNuevo, config)
+                await this.$axios.post('/user/register', usuarioNuevo, config)
                     .then((res) =>{
                         console.log('res',res)
                         if(res.data.error === null){
@@ -158,9 +208,38 @@
                         console.log('error', error)
                     })
             },
-            async eraseUser(item){
-              console.log(item)
-              if(item.name !== 'adminangel'){
+
+            async actualizarUsuario(){
+                if(this.admin !== 'adminangel'){
+                    const config = {
+                    headers: {
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+                const actualizar = {
+                    id: this.idUpdateUser,
+                    name: this.name,
+                    lastname: this.lastname,
+                    email: this.email,
+                    password: this.password
+                }
+                await this.$axios.put('/user/updateuser', actualizar, config)
+                .then((res) => {
+                        console.log(res)
+                        if(res.data.message === 'Usuario Actualizado'){
+                            this.loadUsers()
+                            this.openDialogActualizar = false
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error ,'algo no jala')
+                    })
+                }
+            },
+
+            async eraseUser(){
+              if(this.admin !== 'adminangel'){
                 const config = {
                     headers: {
                         'Content-Type': 'application/json;charset=UTF-8',
@@ -168,13 +247,14 @@
                     }
                 }
                 const usuario = {
-                    id: item._id
+                    id: this.idEraseUser
                 }
-                await this.$axios.post('/eraseusers', usuario, config)
+                await this.$axios.post('/user/eraseusers', usuario, config)
                     .then((res) => {
                         console.log(res)
                         if(res.data.message === 'Usuario borrado'){
                             this.loadUsers()
+                            this.openDialogErase = false
                         }
                     })
                     .catch((error) => {
@@ -182,6 +262,18 @@
                     })
               }
               
+            },
+
+            dialogUser(item){
+                this.idEraseUser = item._id
+                this.admin = item.name
+                this.openDialogErase = true
+            },
+
+            dialogA(item){
+                this.openDialogActualizar = true
+                this.admin = item.name
+                this.idUpdateUser = item._id
             }
         }
     }
