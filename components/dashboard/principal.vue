@@ -11,7 +11,7 @@
           <template #[`item.actions`]=" { item }">
             <v-row class="renglon">
               <v-col cols="6" >
-                <v-btn icon color="orange" @click="dialogA(item)">
+                <v-btn icon color="orange" @click="dialogUpdate(item)">
                   <v-icon>mdi-human-edit</v-icon>
                 </v-btn>
               </v-col>
@@ -63,25 +63,24 @@
         </v-dialog>
 
         <!--Formulario para actualizar-->
-        <v-dialog v-model="openDialogActualizar" width="800" height="500" persistent>
+        <v-dialog v-model="openDialogUpdate" width="800" height="500" persistent>
             <v-card>
                 <v-card-title>Actualizar Usuario</v-card-title>
                 <v-card-text>
-                    <v-form ref="formActualizar">
-                        <v-text-field v-model="name" type="text" placeholder="Name:" label="Name"></v-text-field>
-                        <v-text-field v-model="lastname" type="text" placeholder="Lastname:" label="Lastname"></v-text-field>
-                        <v-text-field v-model="email" type="email" placeholder="Email:" label="Email"></v-text-field>
-                        <v-text-field v-model="password" type="password" placeholder="Password:" label="Password"></v-text-field>
+                    <v-form ref="formUpdate">
+                        <v-text-field v-model="nameUpdate" type="text" placeholder="Name:" label="Name"></v-text-field>
+                        <v-text-field v-model="lastnameUpdate" type="text" placeholder="Lastname:" label="Lastname"></v-text-field>
+                        <v-text-field v-model="passwordUpdate" type="password" placeholder="Password:" label="Password"></v-text-field>
                     </v-form>
                 </v-card-text>
                 <v-card-actions style="width: 100%; display: flex; flex-direction: column;">
                     <v-row style="width: 100%; margin-top:5px;margin-bottom: 10px;">
-                        <v-btn block color="green" @click="actualizarUsuario">
+                        <v-btn block color="green" @click="actualizaUsuario">
                             Actualizar
                         </v-btn>
                     </v-row>
                     <v-row style="width: 100%; margin-top:5px;margin-bottom: 10px;">
-                        <v-btn block color="red" @click="openDialogActualizar= false">
+                        <v-btn block color="red" @click="openDialogUpdate= false">
                             Cancelar
                         </v-btn>
                     </v-row>
@@ -145,15 +144,20 @@
                     }
                 ],
                 openDialog: false,
-                openDialogActualizar: false,
-                idUpdateUser: '',
                 name:'',
                 lastname: '',
                 email: '',
                 password: '',
                 idEraseUser: '',
                 openDialogErase: false,
-                admin: 'adminangel'
+                admin: 'adminangel',
+                openDialogUpdate: false,
+                nameUpdate:'',
+                lastnameUpdate: '',
+                passwordUpdate: '',
+                datos: {
+
+                }
 
             }
         },
@@ -209,35 +213,6 @@
                     })
             },
 
-            async actualizarUsuario(){
-                if(this.admin !== 'adminangel'){
-                    const config = {
-                    headers: {
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        'Access-Control-Allow-Origin': '*'
-                    }
-                }
-                const actualizar = {
-                    id: this.idUpdateUser,
-                    name: this.name,
-                    lastname: this.lastname,
-                    email: this.email,
-                    password: this.password
-                }
-                await this.$axios.put('/user/updateuser', actualizar, config)
-                .then((res) => {
-                        console.log(res)
-                        if(res.data.message === 'Usuario Actualizado'){
-                            this.loadUsers()
-                            this.openDialogActualizar = false
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error ,'algo no jala')
-                    })
-                }
-            },
-
             async eraseUser(){
               if(this.admin !== 'adminangel'){
                 const config = {
@@ -270,10 +245,40 @@
                 this.openDialogErase = true
             },
 
-            dialogA(item){
-                this.openDialogActualizar = true
-                this.admin = item.name
-                this.idUpdateUser = item._id
+            dialogUpdate(item){
+                this.datos = item
+                this.nameUpdate = this.datos.name
+                this.lastnameUpdate = this.datos.lastname
+                this.passwordUpdate = this.datos.password
+                this.openDialogUpdate = true
+            },
+            async actualizaUsuario (){
+                
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+                const usuarioNuevo = {
+                    id: this.datos._id,
+                    name: this.nameUpdate,
+                    lastname: this.lastnameUpdate,
+                    email: this.datos.email,
+                    password: this.datos.passwordUpdate
+                }
+                await this.$axios.post('/user/updateuser', usuarioNuevo, config)
+                    .then((res) => {
+                        console.log(res)
+                        if(res.data.message === 'Usuario borrado'){
+                            this.loadUsers()
+                            this.openDialogUpdate = false
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+              
             }
         }
     }
