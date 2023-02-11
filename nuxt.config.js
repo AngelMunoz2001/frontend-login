@@ -33,7 +33,7 @@ export default {
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
-  douter: {
+  router: {
     middleware:['auth']
   },
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -74,7 +74,7 @@ export default {
           },        
           endpoints: {          
             login: {            
-              url: 'api/user/login',            
+              url: '/user/login',            
               method: 'post'          
             },          
             user: false        

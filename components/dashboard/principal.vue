@@ -152,12 +152,10 @@
                 openDialogErase: false,
                 admin: 'adminangel',
                 openDialogUpdate: false,
-                nameUpdate:'',
+                nameUpdate: '',
                 lastnameUpdate: '',
                 passwordUpdate: '',
-                datos: {
-
-                }
+                datos: {}
 
             }
         },
@@ -224,7 +222,7 @@
                 const usuario = {
                     id: this.idEraseUser
                 }
-                await this.$axios.post('/user/eraseusers', usuario, config)
+                await this.$axios.post('/user/eraseuser', usuario, config)
                     .then((res) => {
                         console.log(res)
                         if(res.data.message === 'Usuario borrado'){
@@ -252,8 +250,8 @@
                 this.passwordUpdate = this.datos.password
                 this.openDialogUpdate = true
             },
-            async actualizaUsuario (){
-                
+
+            async actualizaUsuario () {
                 const config = {
                     headers: {
                         'Content-Type': 'application/json;charset=UTF-8',
@@ -265,12 +263,12 @@
                     name: this.nameUpdate,
                     lastname: this.lastnameUpdate,
                     email: this.datos.email,
-                    password: this.datos.passwordUpdate
+                    password: this.passwordUpdate
                 }
                 await this.$axios.post('/user/updateuser', usuarioNuevo, config)
                     .then((res) => {
                         console.log(res)
-                        if(res.data.message === 'Usuario borrado'){
+                        if(res.data.message === 'Usuario actualizado'){
                             this.loadUsers()
                             this.openDialogUpdate = false
                         }
