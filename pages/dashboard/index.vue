@@ -8,7 +8,7 @@
 import principal from '~/components/dashboard/principal.vue';
 
     export default{
-        auth: true,
+        auth: false,
         layout: 'dashboard',
         components: {
             principal
